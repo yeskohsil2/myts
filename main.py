@@ -8,20 +8,9 @@ from functools import wraps
 from typing import Optional, Dict, List, Any, Tuple
 from collections import defaultdict
 
-from telegram import (
-    ChatMember,
-    ChatPermissions,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Update
-)
+from telegram import ChatMember, ChatPermissions, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
-from telegram.ext import (
-    Application,
-    CallbackQueryHandler,
-    CommandHandler,
-    ContextTypes,
-)
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 from telegram.error import TelegramError
 
 logging.basicConfig(
@@ -139,7 +128,7 @@ async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: 
         chat_member = await context.bot.get_chat_member(chat_id, user_id)
         return chat_member.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]
     except TelegramError as e:
-        logger.error(f"Error checking admin status for user {user_id} in chat {chat_id}: {e}")
+        logger.error(f"Error checking admin status: {e}")
         return False
 
 async def bot_has_permissions(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> bool:
@@ -147,7 +136,7 @@ async def bot_has_permissions(chat_id: int, context: ContextTypes.DEFAULT_TYPE) 
         bot_member = await context.bot.get_chat_member(chat_id, context.bot.id)
         return bot_member.status == ChatMember.ADMINISTRATOR
     except TelegramError as e:
-        logger.error(f"Error checking bot permissions in chat {chat_id}: {e}")
+        logger.error(f"Error checking bot permissions: {e}")
         return False
 
 def admin_only(func):
