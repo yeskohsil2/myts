@@ -10,7 +10,7 @@ from collections import defaultdict
 
 from telegram import ChatMember, ChatPermissions, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, ApplicationBuilder
 from telegram.error import TelegramError
 
 logging.basicConfig(
@@ -632,29 +632,29 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     load_muted_users()
-
-    app = Application.builder().token(BOT_TOKEN).build()
-
-    app.add_handler(CommandHandler("ban", ban_command))
-    app.add_handler(CommandHandler("kick", kick_command))
-    app.add_handler(CommandHandler("mute", mute_command))
-    app.add_handler(CommandHandler("unmute", unmute_command))
-    app.add_handler(CommandHandler("warn", warn_command))
-    app.add_handler(CommandHandler("report", report_command))
-    app.add_handler(CommandHandler("clear", clear_command))
-    app.add_handler(CommandHandler("pin", pin_command))
-    app.add_handler(CommandHandler("unpin", unpin_command))
-    app.add_handler(CommandHandler("help", help_command))
-
-    app.add_handler(CallbackQueryHandler(report_callback, pattern="^(ban|kick|mute|skip)_"))
-
-    app.job_queue.run_repeating(check_muted_users, interval=30, first=10)
-    app.job_queue.run_repeating(clean_report_cooldown, interval=300, first=60)
-
-    app.add_error_handler(error_handler)
-
+    
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    
+    application.add_handler(CommandHandler("ban", ban_command))
+    application.add_handler(CommandHandler("kick", kick_command))
+    application.add_handler(CommandHandler("mute", mute_command))
+    application.add_handler(CommandHandler("unmute", unmute_command))
+    application.add_handler(CommandHandler("warn", warn_command))
+    application.add_handler(CommandHandler("report", report_command))
+    application.add_handler(CommandHandler("clear", clear_command))
+    application.add_handler(CommandHandler("pin", pin_command))
+    application.add_handler(CommandHandler("unpin", unpin_command))
+    application.add_handler(CommandHandler("help", help_command))
+    
+    application.add_handler(CallbackQueryHandler(report_callback, pattern="^(ban|kick|mute|skip)_"))
+    
+    application.job_queue.run_repeating(check_muted_users, interval=30, first=10)
+    application.job_queue.run_repeating(clean_report_cooldown, interval=300, first=60)
+    
+    application.add_error_handler(error_handler)
+    
     print("Bot is starting...")
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
     main()
