@@ -214,6 +214,8 @@ async def clean_report_cooldown(context: ContextTypes.DEFAULT_TYPE):
         if not report_cooldown[reporter_id]:
             del report_cooldown[reporter_id]
 
+# update
+
 async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await rate_limit(update):
         return
