@@ -10,7 +10,7 @@ from collections import defaultdict
 
 from telegram import ChatMember, ChatPermissions, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, ApplicationBuilder
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, JobQueue
 from telegram.error import TelegramError
 
 logging.basicConfig(
@@ -213,8 +213,6 @@ async def clean_report_cooldown(context: ContextTypes.DEFAULT_TYPE):
 
         if not report_cooldown[reporter_id]:
             del report_cooldown[reporter_id]
-
-# update
 
 async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await rate_limit(update):
@@ -635,7 +633,12 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     load_muted_users()
     
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    application = Application.builder().token(BOT_TOKEN).build()
+    
+    job_queue = JobQueue()
+    job_queue.set_application(application)
+    job_queue.start()
+    application.job_queue = job_queue
     
     application.add_handler(CommandHandler("ban", ban_command))
     application.add_handler(CommandHandler("kick", kick_command))
